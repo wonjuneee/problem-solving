@@ -7,11 +7,11 @@ public class Main {
 
     static final int[][] sudoku = new int[NINE + 2][NINE + 2];
     static final List<int[]> emptyGridList = new ArrayList<>();
-    // 각 행, 열, 블럭에 존재하는 값을 저장하는 이차원 배열
-    // [a][b] : a번 째 행/열/블럭에 b가 사용되었는지 여부
-    static final boolean[][] rowValidation = new boolean[NINE + 1][NINE + 1];
-    static final boolean[][] colValidation = new boolean[NINE + 1][NINE + 1];
-    static final boolean[][] blockValidation = new boolean[NINE + 1][NINE + 1];
+    // 각 행, 열, 블럭에 각 비트에 해당하는 값이 사용되었는지 판단하는 배열
+    // validation[A] = 010101110x : A 행/열/블럭에서 2, 3, 4, 6, 8 사용
+    static final int[] rowValidation = new int[NINE + 1];
+    static final int[] colValidation = new int[NINE + 1];
+    static final int[] blockValidation = new int[NINE + 1];
 
     static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -29,10 +29,10 @@ public class Main {
                 if (number == 0) {
                     emptyGridList.add(new int[]{ i, j });
                 } else {
-                    rowValidation[i][number] = true;
-                    colValidation[j][number] = true;
+                    rowValidation[i] |= (1 << number);
+                    colValidation[j] |= (1 << number);
                     // e.g., (5, 3) : [{(5-1)/3} * 3 + (3-1)/3] + 1 = 3 + 0 + 1 = 4
-                    blockValidation[((i - 1) / 3) * 3 + (j - 1) / 3 + 1][number] = true;
+                    blockValidation[((i - 1) / 3) * 3 + (j - 1) / 3 + 1] |= (1 << number);
                 }
             }
         }
@@ -67,17 +67,18 @@ public class Main {
 
         // 사전 순으로 가능한 케이스 순회
         for (int i = 1; i <= NINE; i++) {
-            if (!rowValidation[row][i] && !colValidation[col][i] && !blockValidation[blockNum][i]) {
+            // 010101110x & 000001000x == 000001000x : 4는 사용되었으므로 조건에 부합하지 않음
+            if (((rowValidation[row] & (1 << i)) != (1 << i)) && ((colValidation[col] & (1 << i)) != (1 << i)) && ((blockValidation[blockNum] & (1 << i)) != (1 << i))) {
                 sudoku[row][col] = i;
-                rowValidation[row][i] = true;
-                colValidation[col][i] = true;
-                blockValidation[blockNum][i] = true;
+                rowValidation[row] |= (1 << i);
+                colValidation[col] |= (1 << i);
+                blockValidation[blockNum] |= (1 << i);
                 // 하위 재귀에서 false가 넘어오면, i를 현재 칸에 채울 수 없는 것이므로 현재 칸을 초기화 후 다음 반복 수행
                 if (!dfs(idx + 1)) {
                     sudoku[row][col] = 0;
-                    rowValidation[row][i] = false;
-                    colValidation[col][i] = false;
-                    blockValidation[blockNum][i] = false;
+                    rowValidation[row] &= ~(1 << i);
+                    colValidation[col] &= ~(1 << i);
+                    blockValidation[blockNum] &= ~(1 << i);
                 }
                 // 모든 빈 칸을 채운 경우에만 true를 반환하므로, 한 번 true가 반환되면 그대로 넘겨주기
                 else {
