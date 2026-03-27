@@ -6,6 +6,7 @@ public class Main {
     static int n, m, x;
 
     static final List<int[]>[] map = new ArrayList[1001];
+    static final List<int[]>[] reverseMap = new ArrayList[1001];
     static final int[] minTime = new int[1001];
     static final int[] totalTime = new int[1001];
 
@@ -23,6 +24,7 @@ public class Main {
 
         for (int i = 1; i <= n; i++) {
             map[i] = new ArrayList<>();
+            reverseMap[i] = new ArrayList<>();
         }
 
         for (int i = 1; i <= m; i++) {
@@ -32,22 +34,13 @@ public class Main {
             int weight = Integer.parseInt(st.nextToken());
 
             map[start].add(new int[]{ end, weight });
+            reverseMap[end].add(new int[]{ start, weight });
         }
 
-        for (int i = 1; i <= n; i++) {
-            // 매 반복마다, 각 노드로부터의 최단거리를 저장하기 위한 배열을 정수 최대값으로 초기화
-            Arrays.fill(minTime, Integer.MAX_VALUE);
-            int time = dijkstra(i);
-
-            // 시작노드가 목표노드인 경우, 목표노드에서 각 노드로의 최단거리(돌아오는 시간)을 각 노드의 종합시간에 더해준다.
-            if (i == x) {
-                for (int j = 1; j <= n; j++) {
-                    totalTime[j] += minTime[j];
-                }
-            } else {
-                totalTime[i] += time;
-            }
-        }
+        // 각 노드에서 목표노드 x로의 최단거리
+        dijkstra(x, map);
+        // 목표노드 x에서 각 노드로의 최단거리
+        dijkstra(x, reverseMap);
 
         int result = 0;
         for (int i = 1; i <= n; i++) {
@@ -60,7 +53,10 @@ public class Main {
         br.close();
     }
 
-    static int dijkstra(int start) {
+    // 정방향, 역방향 그래프 중 하나를 사용해 다익스트라 순회
+    static void dijkstra(int start, List<int[]>[] map) {
+        Arrays.fill(minTime, Integer.MAX_VALUE);
+
         PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(i1 -> i1[1]));
         pq.add(new int[]{ start, 0 });
         minTime[start] = 0;
@@ -82,7 +78,8 @@ public class Main {
             }
         }
 
-        // start 노드에서 목표노드 x까지의 최단거리를 반환
-        return minTime[x];
+        for (int i = 1; i <= n; i++) {
+            totalTime[i] += minTime[i];
+        }
     }
 }
