@@ -7,7 +7,7 @@ public class Main {
 
     static final int[][] directions = new int[][]{{ 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 }};
     static final int[][] map = new int[102][102];
-    static final List<int[]> cheeses = new ArrayList<>();
+    static final Queue<int[]> cheeses = new ArrayDeque<>();
     static final boolean[][] isVisited = new boolean[101][101];
 
     static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -91,19 +91,24 @@ public class Main {
 
     static void checkCheese() {
         Queue<int[]> removedCheese = new ArrayDeque<>();
-        for (int[] cheese : cheeses) {
+        // 최초 치즈 개수에 대해서만 반복문을 수행하고, 녹지 않은 치즈는 다음 반복문(checkCheese)에서 재판단이 수행되도록 cheeses의 뒤에 다시 추가한다.
+        int initSize = cheeses.size();
+        for (int i = 0; i < initSize; i++) {
+            int[] cheese = cheeses.poll();
             int cheeseRow = cheese[0], cheeseCol = cheese[1];
-
             int count = 0;
             for (int[] direction : directions) {
                 count = map[cheeseRow + direction[0]][cheeseCol + direction[1]] == 2 ? count + 1 : count;
             }
-            if (count >= 2) {
+            if (count < 2) {
+                cheeses.add(cheese);
+            } else {
                 removedCheese.add(cheese);
             }
         }
 
-        cheeses.removeAll(removedCheese);
+        // 동시에 녹지 않고, 순차적으로 녹을 경우, 녹지 않아야 할 치즈가 녹을수도 있으므로
+        // 모든 치즈에 대한 녹음 여부를 판단한 뒤, 일괄적으로 데이터 처리
         while (!removedCheese.isEmpty()) {
             int[] cheese = removedCheese.poll();
             int row = cheese[0], col = cheese[1];
