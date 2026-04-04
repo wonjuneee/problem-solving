@@ -4,106 +4,123 @@ import java.util.*;
 public class Main {
 
     static int n, m;
-    static int[][] laboratory = new int[10][10];
+    static int safeArea = 0;
 
-    static final List<int[]> virusPosition = new LinkedList<>();
-    static final int[][] directions = new int[][]{ {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
+    static final int[][] directions = new int[][]{{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+    static final int[][] map = new int[10][10];
+    static final List<int[]> newWallPosition = new ArrayList<>();
+    static final List<int[]> virusPosition = new ArrayList<>();
+    static final Queue<int[]> bfsQ = new ArrayDeque<>();
+    static final boolean[][] isVisited = new boolean[10][10];
 
     static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
     /**
-     * n, m <= 8 이므로 64C3 = 41664
-     * 바이러스가 퍼질 수 있는 칸을 순회 : 64칸
-     * 따라서 벽이 세워지는 경우의 수 각각에 대해 바이러스 전파 연산을 수행하면
-     * 총 2,666,496 회의 연산이 이루어지므로 시간제한 2초 내에 동작 가능하다.
+     * 14502 연구소
      */
     public static void main(String[] args) throws IOException {
         StringTokenizer st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
 
-        for (int row = 0; row <= n + 1; row++) {
-            if (row == 0 || row == n + 1) {
-                Arrays.fill(laboratory[row], 1);
+        for (int i = 0; i <= n + 1; i++) {
+            if (i == 0 || i == n + 1) {
+                Arrays.fill(map[i], 1);
                 continue;
             }
             st = new StringTokenizer(br.readLine());
-            for (int col = 0; col <= m + 1; col++) {
-                if (col == 0 || col == m + 1) {
-                    laboratory[row][col] = 1;
-                } else {
-                    int component = Integer.parseInt(st.nextToken());
-                    laboratory[row][col] = component;
-                    if (component == 2) {
-                        // 바이러스 전파 시작 지점을 기록하기 위함
-                        virusPosition.add(new int[]{row, col});
-                    }
-                }
-            }
-        }
-
-        // (n*m)C3 수행
-        int space = n * m;
-        int result = 0;
-        for (int i = 1; i <= space - 2; i++) {
-            int aRow = (i - 1) / m + 1, aCol = (i - 1) % m + 1;
-            if (laboratory[aRow][aCol] != 0) {
-                continue;
-            }
-            laboratory[aRow][aCol] = 1;
-
-            for (int j = i + 1; j <= space - 1; j++) {
-                int bRow = (j - 1) / m + 1, bCol = (j - 1) % m + 1;
-                if (laboratory[bRow][bCol] != 0) {
+            for (int j = 0; j <= m + 1; j++) {
+                if (j == 0 || j == m + 1) {
+                    map[i][j] = 1;
                     continue;
                 }
-                laboratory[bRow][bCol] = 1;
+                int element = Integer.parseInt(st.nextToken());
+                map[i][j] = element;
 
-                for (int k = j + 1; k <= space; k++) {
-                    int cRow = (k - 1) / m + 1, cCol = (k - 1) % m + 1;
-                    if (laboratory[cRow][cCol] != 0) {
-                        continue;
-                    }
-                    laboratory[cRow][cCol] = 1;
-                    result = Math.max(result, bfsAndCount());
-                    laboratory[cRow][cCol] = 0;
+                if (element == 2) {
+                    virusPosition.add(new int[]{ i, j });
+                } else if (element == 0) {
+                    safeArea++;
                 }
-                laboratory[bRow][bCol] = 0;
             }
-            laboratory[aRow][aCol] = 0;
         }
+
+        // 3개의 벽을 세울 수 있는 모든 경우의 수를 계산한 뒤, 각 케이스마다 바이러스를 전파
+        getNewWallCombination(1, 3, new int[3]);
+        int result = pollution();
+
         bw.write(String.valueOf(result));
         bw.flush();
         bw.close();
+        br.close();
     }
 
-    // 매 경우의 수마다 virusPosition에서부터 bfs 순회
-    static int bfsAndCount() {
-        Queue<int[]> q = new LinkedList<>(virusPosition);
-        boolean[][] isVisited = new boolean[10][10];
+    // nCr, 최초 r은 항상 3으로 고정
+    static void getNewWallCombination(int startPos, int r, int[] pos) {
+        // r == 0 인 경우 벽 3개를 모두 세운 케이스가 되므로 newWallPosition에 기록
+        if (r == 0) {
+            newWallPosition.add(Arrays.copyOf(pos, 3));
+            return;
+        }
 
-        while (!q.isEmpty()) {
-            int[] currPos = q.poll();
-            int currRow = currPos[0], currCol = currPos[1];
-            isVisited[currRow][currCol] = true;
+        for (int i = startPos; i <= n * m; i++) {
+            // 이차원 좌표를 숫자로 저장하고 싶을 때, 전체 열 개수를 기준으로 나눗셈/모듈러 연산을 수행하면 됨
+            int row = (i - 1) / m + 1, col = (i - 1) % m + 1;
+            if (map[row][col] != 2 && map[row][col] != 1) {
+                pos[3 - r] = i;
+                // 조합이므로 i+1 이후 값을 선택하면 된다. (순열인 경우 1부터 다시 반복하며 선택되지 않은 값을 선택하면 된다.)
+                getNewWallCombination(i + 1, r - 1, pos);
+            }
+        }
+    }
 
-            for (int[] d : directions) {
-                int nextRow = currRow + d[0], nextCol = currCol + d[1];
-                if (laboratory[nextRow][nextCol] == 0 && !isVisited[nextRow][nextCol]) {
-                    q.add(new int[]{ nextRow, nextCol });
-                }
+    // 각 조합마다 벽을 세운 뒤, 바이러스 위치에서 전파를 진행
+    static int pollution() {
+        int result = 0;
+
+        for (int[] wallComb : newWallPosition) {
+            for (int idx : wallComb) {
+                int row = (idx - 1) / m + 1, col = (idx - 1) % m + 1;
+                map[row][col] = 1;
+            }
+            result = Math.max(bfs(safeArea), result);
+            for (int idx : wallComb) {
+                int row = (idx - 1) / m + 1, col = (idx - 1) % m + 1;
+                map[row][col] = 0;
             }
         }
 
-        int count = 0;
+        return result;
+    }
+
+
+    // 바이러스가 전파될 때마다 안전지역 수에 -1. 이때, 벽 개수만큼 차감하여 반환하도록 한다.
+    static int bfs(int safeArea) {
+        bfsQ.clear();
         for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= m; j++) {
-                if (laboratory[i][j] == 0 && !isVisited[i][j]) {
-                    count++;
+            Arrays.fill(isVisited[i], false);
+        }
+        bfsQ.addAll(virusPosition);
+        for (int[] virus : virusPosition) {
+            isVisited[virus[0]][virus[1]] = true;
+        }
+
+        while (!bfsQ.isEmpty()) {
+            int[] node = bfsQ.poll();
+            int row = node[0], col = node[1];
+
+            for (int[] direction : directions) {
+                int nextRow = row + direction[0], nextCol = col + direction[1];
+
+                if (!isVisited[nextRow][nextCol] && map[nextRow][nextCol] != 1) {
+                    bfsQ.add(new int[]{ nextRow, nextCol });
+                    isVisited[nextRow][nextCol] = true;
+                    safeArea--;
                 }
             }
         }
-        return count;
+
+        return safeArea - 3;
     }
 }
