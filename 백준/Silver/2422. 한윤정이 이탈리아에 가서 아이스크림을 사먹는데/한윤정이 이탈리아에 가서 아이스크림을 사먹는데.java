@@ -5,7 +5,7 @@ public class Main {
 
     static int n, m;
 
-    static final Map<Integer, Set<Integer>> iceCreamSet = new HashMap<>();
+    static final boolean[][] disjoint = new boolean[201][201];
 
     static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -24,8 +24,8 @@ public class Main {
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
 
-            iceCreamSet.computeIfAbsent(a, (key) -> new HashSet<>()).add(b);
-            iceCreamSet.computeIfAbsent(b, (key) -> new HashSet<>()).add(a);
+            disjoint[a][b] = true;
+            disjoint[b][a] = true;
         }
 
         int result = combination(1, 0, new int[3]);
@@ -50,7 +50,7 @@ public class Main {
             boolean flag = true;
             for (int count = 0; count < r; count++) {
                 int choice = arr[count];
-                if (i != choice && iceCreamSet.containsKey(choice) && iceCreamSet.get(choice).contains(i)) {
+                if (disjoint[choice][i]) {
                     flag = false;
                     break;
                 }
