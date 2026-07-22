@@ -7,23 +7,17 @@ class Solution {
         
         Map<String, Integer> participantCountMap = new HashMap<>();
         
-        for (int i = 0; i < participant.length; i++) {
-            participantCountMap.compute(
-                participant[i],
-                (k, v) -> v == null ? 1 : v + 1
-            );
+        for (String part: participant) {
+            participantCountMap.put(part, participantCountMap.getOrDefault(part, 0) + 1);
         }
         
-        for (int i = 0; i < completion.length; i++) {
-            participantCountMap.compute(
-                completion[i],
-                (k, v) -> v - 1
-            );
+        for (String comp: completion) {
+            participantCountMap.put(comp, participantCountMap.getOrDefault(comp, 0) - 1);
         }
         
-        for (int i = 0; i < participant.length; i++) {
-            if (participantCountMap.get(participant[i]) != 0) {
-                return participant[i];
+        for (Map.Entry<String, Integer> entry: participantCountMap.entrySet()) {
+            if (entry.getValue() != 0) {
+                return entry.getKey();
             }
         }
         
