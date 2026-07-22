@@ -2,25 +2,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 class Solution {
-    public String solution(String[] participant, String[] completion) {
-        String answer = "";
+    public static String solution(String[] participant, String[] completion) { 
+
+        Map<String, Integer> participantMap = new HashMap<>(); 
         
-        Map<String, Integer> participantCountMap = new HashMap<>();
-        
-        for (String part: participant) {
-            participantCountMap.put(part, participantCountMap.getOrDefault(part, 0) + 1);
-        }
-        
-        for (String comp: completion) {
-            participantCountMap.put(comp, participantCountMap.getOrDefault(comp, 0) - 1);
-        }
-        
-        for (Map.Entry<String, Integer> entry: participantCountMap.entrySet()) {
-            if (entry.getValue() != 0) {
-                return entry.getKey();
+        for (int i = 0; i < participant.length ; i++) { 
+            participantMap.compute(participant[i], (k, v) -> v != null ? null : 1);
+            
+            if (i < completion.length) {
+                participantMap.compute(completion[i], (k,v) -> v != null ? null : 1);
             }
         }
         
-        return answer;
+        return participantMap.keySet().iterator().next(); 
     }
 }
