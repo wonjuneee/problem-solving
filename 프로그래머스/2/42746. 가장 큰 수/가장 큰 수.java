@@ -33,9 +33,7 @@ class Solution {
         }
         answer = sb.toString();
         
-        if (Arrays.stream(answer.split("")).allMatch("0"::equals)) {
-            answer = "0";
-        }
+        answer = answer.charAt(0) == '0' ? "0" : answer;
         
         return answer;
     }
