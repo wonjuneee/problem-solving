@@ -1,8 +1,6 @@
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 class Solution {
     public int solution(int n, int[][] wires) {
@@ -16,12 +14,15 @@ class Solution {
         *   이것을 모든 노드에서, 각 노드의 자식노드를 분리하여 2개의 네트워크로 만들었을 때의 diff 최소값을 최종적으로 반환한다.
         */
         
-        Map<Integer, Set<Integer>> tree = new HashMap<>();
+        List<Integer>[] tree = new ArrayList[n + 1];
+        for (int i = 1; i <= n; i++) {
+            tree[i] = new ArrayList<>();
+        }
         int total = 0;
         
         for (int[] wire: wires) {
-            tree.computeIfAbsent(wire[0], k -> new HashSet<>()).add(wire[1]);
-            tree.computeIfAbsent(wire[1], k -> new HashSet<>()).add(wire[0]);
+            tree[wire[0]].add(wire[1]);
+            tree[wire[1]].add(wire[0]);
             
             total = Math.max(total, Math.max(wire[0], wire[1]));
         }
@@ -35,13 +36,13 @@ class Solution {
         return answer;
     }
     
-    int[] dfs(Map<Integer, Set<Integer>> tree, boolean[] isVisited, int node, int total) {        
+    int[] dfs(List<Integer>[] tree, boolean[] isVisited, int node, int total) {        
         
         // 부모 노드에 반환할 자식 노드 개수에 자신도 포함
         int cnt = 1, diff = total - 1;
         isVisited[node] = true;
         
-        for (Integer child: tree.get(node)) {
+        for (Integer child: tree[node]) {
             // 양방향 간선으로 구성되어 있으므로, 말단 노드는 이미 방문한 노드들과만 연결되어 있다고 볼 수 있다. 따라서 { cnt=1, diff=total }을 반환한다.
             if (!isVisited[child]) {
                 
