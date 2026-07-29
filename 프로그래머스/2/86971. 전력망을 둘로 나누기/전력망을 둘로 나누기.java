@@ -20,10 +20,8 @@ class Solution {
         int total = 0;
         
         for (int[] wire: wires) {
-            tree.putIfAbsent(wire[0], new HashSet<>());
-            tree.putIfAbsent(wire[1], new HashSet<>());
-            tree.get(wire[0]).add(wire[1]);
-            tree.get(wire[1]).add(wire[0]);
+            tree.computeIfAbsent(wire[0], k -> new HashSet<>()).add(wire[1]);
+            tree.computeIfAbsent(wire[1], k -> new HashSet<>()).add(wire[0]);
             
             total = Math.max(total, Math.max(wire[0], wire[1]));
         }
