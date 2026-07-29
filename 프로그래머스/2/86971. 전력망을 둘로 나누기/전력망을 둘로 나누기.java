@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,43 +17,38 @@ class Solution {
         for (int i = 1; i <= n; i++) {
             tree[i] = new ArrayList<>();
         }
-        int total = 0;
-        
         for (int[] wire: wires) {
             tree[wire[0]].add(wire[1]);
             tree[wire[1]].add(wire[0]);
-            
-            total = Math.max(total, Math.max(wire[0], wire[1]));
         }
         // System.out.println(tree);
         
-        boolean[] isVisited = new boolean[total + 1];
-        Arrays.fill(isVisited, false);
+        boolean[] isVisited = new boolean[n + 1];
         
-        answer = dfs(tree, isVisited, 1, total)[1];
+        answer = dfs(tree, isVisited, 1, n)[1];
         
         return answer;
     }
     
-    int[] dfs(List<Integer>[] tree, boolean[] isVisited, int node, int total) {        
+    int[] dfs(List<Integer>[] tree, boolean[] isVisited, int node, int n) {        
         
         // 부모 노드에 반환할 자식 노드 개수에 자신도 포함
-        int cnt = 1, diff = total - 1;
+        int cnt = 1, diff = n - 1;
         isVisited[node] = true;
         
         for (Integer child: tree[node]) {
-            // 양방향 간선으로 구성되어 있으므로, 말단 노드는 이미 방문한 노드들과만 연결되어 있다고 볼 수 있다. 따라서 { cnt=1, diff=total }을 반환한다.
+            // 양방향 간선으로 구성되어 있으므로, 말단 노드는 이미 방문한 노드들과만 연결되어 있다고 볼 수 있다. 따라서 { cnt=1, diff=n }을 반환한다.
             if (!isVisited[child]) {
                 
-                int[] childInfo = dfs(tree, isVisited, child, total);
+                int[] childInfo = dfs(tree, isVisited, child, n);
                 int childCnt = childInfo[0], childDiff = childInfo[1];
 
-                // 현재 node에서 한 자식노드에 대한 diff는 total에서 childCnt를 뺀 값과 childCnt를 뺀 값이, 두 그래프의 노드 개수 차이이다.
+                // 현재 node에서 한 자식노드에 대한 diff는 n에서 childCnt를 뺀 값과 childCnt를 뺀 값이, 두 그래프의 노드 개수 차이이다.
                 // 이때 현재 node의 최종 diff는 모든 자식노드에 대한 diff 중 최소값이다.
-                diff = Math.min(diff, Math.min(childDiff, Math.abs(total - (childCnt * 2))));
+                diff = Math.min(diff, Math.min(childDiff, Math.abs(n - (childCnt * 2))));
                 cnt += childCnt;
                 
-                // System.out.println("NODE: " + node + ", DIFF: " +  Math.abs(total - (childCnt * 2)));
+                // System.out.println("NODE: " + node + ", DIFF: " +  Math.abs(n - (childCnt * 2)));
             }
         }
         
