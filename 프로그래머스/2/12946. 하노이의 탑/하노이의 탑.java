@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 class Solution {
@@ -15,7 +13,6 @@ class Solution {
     
     List<int[]> hanoi(int n, int from, int mid, int to) {
         if (n == 1) {
-            System.out.println(from + " " + to);
             return List.of(new int[] { from, to });
         }
         
