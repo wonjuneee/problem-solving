@@ -17,18 +17,16 @@ class Solution {
                 String nth = Integer.toString(currCnt++, n).toUpperCase();
                 int size = nth.length();
                 
+                int offset = 0, repeat = 0;
                 if (i <= p) {
-                    int offset = p - i, repeat = 0;
-                    while (offset + m * repeat < size && answer.length() < t) {
-                        answer.append(nth.charAt(offset + m * repeat));
-                        repeat++;
-                    }
+                    offset = p - i;
                 } else if (i > p){
-                    int offset = m - i + p, repeat = 0;
-                    while (offset + m * repeat < size && answer.length() < t) {
-                        answer.append(nth.charAt(offset + m * repeat));
-                        repeat++;
-                    }
+                    offset = m - i + p;
+                }
+                
+                while (offset + m * repeat < size && answer.length() < t) {
+                    answer.append(nth.charAt(offset + m * repeat));
+                    repeat++;
                 }
                 i += (size - 1) % m;
                 if (i > m) {
