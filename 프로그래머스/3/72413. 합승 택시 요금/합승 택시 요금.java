@@ -15,7 +15,7 @@ class Solution {
         int[][] cost = new int[n + 1][n + 1];
         
         for (int i = 1; i <= n; i++) {
-            Arrays.fill(cost[i], 20000002);
+            Arrays.fill(cost[i], -1);
             cost[i][i] = 0;
         }
         
@@ -28,7 +28,10 @@ class Solution {
         
         answer = Integer.MAX_VALUE;
         for (int i = 1; i <= n; i++) {
-            answer = Math.min(cost[s][i] + cost[i][a] + cost[i][b], answer);
+            // 모든 경로가 연결되어 있어야 한다.
+            if (cost[s][i] > -1 && cost[i][a] > -1 && cost[i][b] > -1) {
+                answer = Math.min(cost[s][i] + cost[i][a] + cost[i][b], answer);
+            }
         }
         
         return answer;
@@ -38,8 +41,17 @@ class Solution {
         for (int k = 1; k <= n; k++) {
             for (int i = 1; i <= n; i++) {
                 for (int j = 1; j <= n; j++) {
-                    if (cost[i][j] > cost[i][k] + cost[k][j]) {
+                    // k를 경유하는 i-j 경로가 연결되어 있지 않은 케이스
+                    if (cost[i][k] == -1 || cost[k][j] == -1) {
+                        continue;
+                    }
+                    // k 경유 경로가 존재하나, 아직 갱신되지 않은 경우
+                    if (cost[i][j] == -1) {
                         cost[i][j] = cost[i][k] + cost[k][j];
+                    }
+                    // k 경유 경로가 존재하고, 최소 1회 갱신된 경우
+                    else {
+                        cost[i][j] = Math.min(cost[i][j], cost[i][k] + cost[k][j]);
                     }
                 }
             }
