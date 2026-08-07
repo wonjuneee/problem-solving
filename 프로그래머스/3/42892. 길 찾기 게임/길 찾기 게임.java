@@ -1,6 +1,7 @@
 import java.util.Arrays;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
 
 class Solution {
     public int[][] solution(int[][] nodeinfo) {
@@ -30,13 +31,39 @@ class Solution {
             dfs(root, nodes[i]);            
         }
         
-        List<Integer> pre = new ArrayList<>();
-        List<Integer> post = new ArrayList<>();
-        preorder(root, pre);
-        postorder(root, post);
+        int[] pre = new int[nodes.length];
+        int[] post = new int[nodes.length];
+        Deque<Node> stack = new ArrayDeque<>();
+        stack.push(root);
         
-        answer[0] = pre.stream().mapToInt(Integer::intValue).toArray();
-        answer[1] = post.stream().mapToInt(Integer::intValue).toArray();
+        int idx = 0;
+        while (!stack.isEmpty()) {
+            Node node = stack.pop();
+            pre[idx++] = node.value;
+            
+            if (node.right != null) {
+                stack.push(node.right);
+            }
+            if (node.left != null) {
+                stack.push(node.left);
+            }
+        }
+        
+        stack.push(root);
+        idx = nodes.length - 1;
+        while (!stack.isEmpty()) {
+            Node node = stack.pop();
+            
+            post[idx--] = node.value;
+            if (node.left != null) {
+                stack.push(node.left);
+            } 
+            if (node.right != null) {
+                stack.push(node.right);
+            }
+        }
+        answer[0] = pre;
+        answer[1] = post;
         
         return answer;
     }
@@ -55,26 +82,6 @@ class Solution {
                 dfs(root.left, node);
             }
         }
-    }
-    
-    void preorder(Node node, List<Integer> pre) {
-        pre.add(node.value);
-        if (node.left != null) {
-            preorder(node.left, pre);
-        }
-        if (node.right != null) {
-            preorder(node.right, pre);
-        }
-    }
-    
-    void postorder(Node node, List<Integer> post) {
-        if (node.left != null) {
-            postorder(node.left, post);
-        }
-        if (node.right != null) {
-            postorder(node.right, post);
-        }
-        post.add(node.value);
     }
     
     class Node {
