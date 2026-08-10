@@ -27,6 +27,10 @@ class Solution {
         return answer;
     }
     
+    /*
+    *   루트노드부터 트리를 구성하며, 전체 인원 수의 합과 각 노드의 인원 수 중 최대값을 배열로 반환한다.
+    *   @return [ 전체 응시인원 수 합, 각 노드 응시인원 수 중 최대값 ]
+    */
     int[] buildTree(int[][] links, int[] num, Node node) {
         int max = node.count, leftSum = 0, rightSum = 0;
         if (links[node.idx][0] != -1) {
@@ -47,6 +51,11 @@ class Solution {
         return new int[]{ node.count + leftSum + rightSum, max };
     }
     
+    /*
+    *   정답 가능 범위 내에서 이진탐색을 진행한다.
+    *       - mid명으로 그룹을 분류할 때, k개 이하의 그룹으로 나눌 수 있으면 mid명은 정답 후보가 된다.
+    *   k개 이하의 그룹으로 트리가 나뉘어졌을 때, 각 그룹의 인원 수 최대값들 중 최솟값을 반환한다.
+    */
     int binarySearch(int k, int[] num, Node root, int[] treeInfo) {
         int left = treeInfo[1], right = treeInfo[0], result = Integer.MAX_VALUE;
         
@@ -66,6 +75,16 @@ class Solution {
         return result;
     }
     
+    /**
+    *   이진탐색 중인 mid명 이하로 그룹을 유지하며, 간선을 끊은 개수와 그룹 인원 수의 최대값을 추적한다.
+    *   1. 현재 노드 인원 수 + 좌측 서브트리 + 우측 서브트리 <= mid
+    *       한 그룹을 구성할 수 있으므로, 자식노드 간선을 끊지 않는다.
+    *   2. 현재 노드 인원 수 + 좌측 서브트리 + 우측 서브트리 > mid && 현재 노드 인원 수 + 서브트리 중 최소값 <= mid
+    *       두 서브트리 중 인원 수의 합이 큰 것을 끊으면 한 그룹을 구성할 수 있으므로, 해당 간선만 끊는다.
+    *   3. 현재 노드 인원 수 + 서브트리 중 최소값 > mid
+    *       두 서브트리 모두 각자의 그룹을 구성해야하므로, 두 간선을 모두 끊는다.
+    *   부모노드로 간선을 끊지 않은 그룹의 인원 수 합만 올려 보낸다.
+    */
     int[] dfs(int[] num, Node node, int targetSum) {
         
         int leftSum = 0, rightSum = 0, cutCnt = 0, max = node.count;
