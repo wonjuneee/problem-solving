@@ -19,13 +19,16 @@ int solution(vector<vector<int> > maps)
 }
 
 int bfs(vector<vector<int>>& maps, int rSize, int cSize) {
-    queue<vector<int>> q;
+    queue<array<int, 3>> q;
     q.push({ 0, 0, 1 });
-    vector<vector<bool>> visited(rSize, vector<bool>(cSize, false));
+    array<array<int, 100>, 100> visited;
+    for (auto& v: visited) {
+        fill(v.begin(), v.end(), false);
+    }    
     visited[0][0] = true;
     
     while (!q.empty()) {
-        vector<int> curr = q.front();
+        array<int, 3> curr = q.front();
         q.pop();
         int row = curr[0], col = curr[1], cost = curr[2];
         
