@@ -27,20 +27,19 @@ int solution(string begin, string target, vector<string> words) {
         return answer;
     }
     
-    queue<Node*> q;
-    q.push(new Node(begin, 0));
+    queue<Node> q;
+    q.push(Node(begin, 0));
     wordSet.erase(begin);
     
     while (!q.empty()) {
-        Node* curr = q.front();
+        Node curr = q.front();
         q.pop();
         
-        string currWord = curr->word;
-        int count = curr->count;
+        string currWord = curr.word;
+        int count = curr.count;
         
         if (currWord == target) {
             answer = count;
-            delete curr;
             break;
         }
         
@@ -49,13 +48,11 @@ int solution(string begin, string target, vector<string> words) {
             for (int c = 'a'; c <= 'z'; c++) {    
                 nextWord[i] = c;
                 if (wordSet.count(nextWord)) {
-                    q.push(new Node(nextWord, count + 1));
+                    q.push(Node(nextWord, count + 1));
                     wordSet.erase(nextWord);
                 }
             }
         }
-        
-        delete curr;
     }
     
     return answer;
