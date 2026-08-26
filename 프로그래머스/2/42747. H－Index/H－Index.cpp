@@ -14,17 +14,17 @@ int solution(vector<int> citations) {
     
     sort(citations.begin(), citations.end(), compare);
     int size = citations.size();
-    for (int i = 0; i < citations.size(); i++) {        
+    for (int i = 0; i < citations.size() - 1; i++) {        
         int index = i + 1;
         int possibleH = min(citations[i], index);
         
-        if (index == citations.size()) {
-            if (possibleH == index) {
-                answer = max(possibleH, answer);
-            }      
-        } else if (possibleH >= citations[i + 1]) {
+        if (possibleH >= citations[i + 1]) {
             answer = max(possibleH, answer);
         }
+    }
+    
+    if (size == min(citations[size - 1], size)) {
+        answer = max(min(citations[size - 1], size), answer);
     }
     
     return answer;
