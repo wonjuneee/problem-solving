@@ -27,11 +27,6 @@ bool dfs(unordered_map<string, map<string, int>>& map, string from, vector<strin
     return false;
 }
 
-// 티켓 도착지 기준 사전순(오름차순)으로 정렬
-bool cmp(const vector<string>& a, const vector<string>& b) {
-    return a[1] > b[1];
-}
-
 vector<string> solution(vector<vector<string>> tickets) {
     vector<string> answer = {"ICN"};
     /**
@@ -40,7 +35,7 @@ vector<string> solution(vector<vector<string>> tickets) {
     */
     total_tickets = tickets.size();
     
-    sort(tickets.begin(), tickets.end(), cmp);
+    // 티켓 도착지 기준으로 오름차순 정렬이 되므로, 최종결과도 사전 순으로 정렬될 수 있다.
     unordered_map<string, map<string, int>> map;
     for (auto& ticket: tickets) {
         string from = ticket[0], to = ticket[1];
