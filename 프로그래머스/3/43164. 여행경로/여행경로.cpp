@@ -4,7 +4,7 @@ using namespace std;
 
 int total_tickets;
 
-bool dfs(unordered_map<string, map<string, int>>& map, string from, vector<string>& answer, int n) {
+bool dfs(unordered_map<string, map<string, int>>& map, const string& from, vector<string>& answer, int n) {
     if (!map.count(from) && total_tickets != n) {
         return false;
     } else if (total_tickets == n) {
@@ -46,7 +46,6 @@ vector<string> solution(vector<vector<string>> tickets) {
             map[from][to] += 1;
         }
     }
-    
     dfs(map, "ICN", answer, 0);
     
     return answer;
