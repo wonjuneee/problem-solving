@@ -19,6 +19,10 @@ int solution(int n, vector<vector<int>> results) {
     
     for (int k = 1; k <= n; k++) {
         for (int i = 1; i <= n; i++) {
+            // 트리이므로, 후보 경로의 i-k 부분이 연결되어 있지 않으면, 이후 모든 k-j 경로는 고려하지 않아도 된다.
+            if (!graph[i][k]) {
+                continue;
+            }
             for (int j = 1; j <= n; j++) {
                 if (graph[i][k] && graph[k][j]) {
                     graph[i][j] = true;   
