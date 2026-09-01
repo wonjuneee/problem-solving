@@ -2,12 +2,6 @@
 
 using namespace std;
 
-struct Compare {
-    bool operator()(const pair<string, int>& a, const pair<string, int>& b) {
-        return a.second < b.second;
-    }
-};
-
 vector<int> solution(vector<string> genres, vector<int> plays) {
     vector<int> answer;
     /**
