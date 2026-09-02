@@ -9,13 +9,7 @@ struct Job {
 
 struct Compare {
     bool operator()(const Job& a, const Job& b) {
-        if (a.job_length == b.job_length) {
-            if (a.request_time == b.request_time) {
-                return a.number > b.number;
-            }
-            return a.request_time > b.request_time;
-        }
-        return a.job_length > b.job_length;
+        return tie(a.job_length, a.request_time, a.number) > tie(b.job_length, b.request_time, b.number);
     }
 };
 
@@ -32,16 +26,10 @@ int solution(vector<vector<int>> jobs) {
         auto& job = jobs[i];
         int request_time = job[0], job_length = job[1];
         
-        jobs_v.push_back(Job(i, request_time, job_length));
+        jobs_v.emplace_back(Job(i, request_time, job_length));
     }
     sort(jobs_v.begin(), jobs_v.end(), [](const auto& a, const auto& b) {
-        if (a.request_time == b.request_time) {
-            if (a.job_length == b.job_length) {
-                return a.number < b.number;
-            }
-            return a.job_length < b.job_length;
-        }
-        return a.request_time < b.request_time;
+        return tie(a.request_time, a.job_length, a.number) < tie(b.request_time, b.job_length, b.number);
     });
     
     priority_queue<Job, vector<Job>, Compare> pq;
@@ -59,8 +47,6 @@ int solution(vector<vector<int>> jobs) {
         
         time += job.job_length;
         answer += time - job.request_time;
-        
-        cout << job.number << ": " << time << '\n';
         
         // 한 디스크 작업이 수행된 후, request_time이 time보다 작아진 작업을 우선순위 큐에 밀어넣는다.
         while (idx < jobs_v.size() && jobs_v[idx].request_time <= time) {
