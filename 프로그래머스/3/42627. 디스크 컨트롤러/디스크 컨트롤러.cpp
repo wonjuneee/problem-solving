@@ -48,7 +48,7 @@ int solution(vector<vector<int>> jobs) {
     pq.push(jobs_v[0]);
     int time = jobs_v[0].request_time, idx = 1;
     while (!pq.empty() || idx < jobs_v.size()) {
-        // 직전 작업의 종료시간보다 늦은 요청시각의 작업이 남아있을 경우, pq에 밀어넣는다.
+        // 직전 작업의 종료시간보다 늦은 요청시각의 작업이 남아있을 경우, pq에 밀어넣고 시간을 건너뛴다.
         if (pq.empty() && idx < jobs_v.size()) {
             time = jobs_v[idx].request_time;
             pq.push(jobs_v[idx++]);
