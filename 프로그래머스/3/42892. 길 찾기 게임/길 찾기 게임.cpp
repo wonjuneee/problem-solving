@@ -64,23 +64,23 @@ vector<vector<int>> solution(vector<vector<int>> nodeinfo) {
     *   트리의 전위/후위 순회를 기록한다. -> O(N)
     */
     
-    vector<Node*> nodes;
+    vector<Node> nodes;
     for (int i = 0; i < nodeinfo.size(); i++) {
-        nodes.push_back(new Node(nodeinfo[i][0], nodeinfo[i][1], i + 1));
+        nodes.push_back(Node(nodeinfo[i][0], nodeinfo[i][1], i + 1));
     }
     
-    sort(nodes.begin(), nodes.end(), [](const auto a, const auto b) {
-        if (a->y == b->y) {
+    sort(nodes.begin(), nodes.end(), [](const auto& a, const auto& b) {
+        if (a.y == b.y) {
             // x값 기준 오름차순
-            return a->x < b->x;
+            return a.x < b.x;
         }
         // y값 기준 내림차순
-        return a->y > b->y;
+        return a.y > b.y;
     });
     Tree tree;
     
     for (auto& node: nodes) {
-        tree.insert(node);
+        tree.insert(&node);
     }
     
     vector<int> preorderResult;
