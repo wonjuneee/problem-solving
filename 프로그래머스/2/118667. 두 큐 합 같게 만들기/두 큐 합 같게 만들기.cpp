@@ -25,7 +25,7 @@ int solution(vector<int> queue1, vector<int> queue2) {
     int left = 0, right = 0, size = queue1.size();
     long half = total / 2, sum = 0;
     
-    while (left < 2 * size) {
+    do {
         if (sum < half) {
             if (right >= size) {
                 sum += queue2[right - size];
@@ -63,7 +63,7 @@ int solution(vector<int> queue1, vector<int> queue2) {
             
             answer = min(tmp, answer);
         }
-    }
+    } while (left < right);
     
     if (answer == INT_MAX) {
         return -1;
