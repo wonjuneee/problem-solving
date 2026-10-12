@@ -9,7 +9,7 @@ int recursive(int tune, int mul, int sum) {
     
     // 현재 사용된 + 중 *와 매칭되지 않은 +의 개수에 2를 나누면 앞으로 필요한 *의 개수가 나온다.
     // 이때 필요한 * 개수만큼 3의 거듭제곱 수를 구하면 현재 +, *로 구성된 문자열이 올바른 문자열을 구성할 수 있는 후보가 될 수 있는 최댓값이 된다.
-    long long mulNeeded = (sum - (mul * 2)) / 2;
+    int mulNeeded = (sum - (mul * 2)) / 2;
     
     if (tune == 1 && mul * 2 == sum) {
         return 1;
@@ -19,7 +19,9 @@ int recursive(int tune, int mul, int sum) {
         return 0;
     }
     
-    if (tune % 3 == 0 && mulNeeded > 0) {
+    // mulNeeded > 0보다 mulNeeded >= 1이 더 타이트한 조건이다.
+    // (sum = 1, mul = 0)처럼 버림이 이루어지므로
+    if (tune % 3 == 0 && mulNeeded >= 1) {
         result += recursive(tune / 3, mul + 1, sum);
     }
     result += recursive(tune - 1, mul, sum + 1);
